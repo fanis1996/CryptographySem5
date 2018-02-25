@@ -5,15 +5,13 @@ import math
 from curses import ascii
 
 def hex_edit(filepath):
-    filesize = os.path.getsize(filepath)
-    rows = math.ceil(filesize/16)
     with open(filepath,'rb') as f:
         data = f.read()
-    print(len(data),filesize)
+    rows = len(data)
     scr = curses.initscr()
-    offsetdisplay = curses.newpad(100,10)
-    hexdisplay = curses.newpad(100,32)
-    bytedisplay = curses.newpad(100,16)
+    offsetdisplay = curses.newpad(rows+1,10)
+    hexdisplay = curses.newpad(rows+1,32)
+    bytedisplay = curses.newpad(rows+1,16)
     bitsdisplay = curses.newwin(2,8,10,40)
     draw_offs_display(offsetdisplay,rows)
     draw_hex_display(hexdisplay,data)
