@@ -11,8 +11,8 @@ def hex_edit(filepath):
         data = f.read()
     print(len(data),filesize)
     scr = curses.initscr()
-    offsetdisplay = curses.newpad(100,11)
-    hexdisplay = curses.newpad(100,33)
+    offsetdisplay = curses.newpad(100,10)
+    hexdisplay = curses.newpad(100,32)
     bytedisplay = curses.newpad(100,16)
     bitsdisplay = curses.newwin(2,8,10,40)
     draw_offs_display(offsetdisplay,rows)
@@ -23,16 +23,16 @@ def hex_edit(filepath):
 
 def draw_offs_display(offsd,rows):
     offsd.addstr("- offset -")
-    for i in range(rows-1):
-        offsd.addstr(i+1,0,"{0:#0{1}x}".format(i<<4,10))
-    offsd.refresh(0,0,1,0,20,11)
+    for i in range(rows):
+        offsd.addstr("{0:#0{1}x}".format(i<<4,10))
+    offsd.refresh(0,0,1,0,20,10)
 
 def draw_hex_display(hexd,data):
     for i in range(16):
         hexd.addstr(" {0:X}".format(i))
         #https://stackoverflow.com/questions/19210414/byte-array-to-hex-string
     hexd.addstr(binascii.hexlify(data).decode('ascii'))
-    hexd.refresh(0,0,1,12,20,43)
+    hexd.refresh(0,0,1,12,20,44)
 
 def draw_byte_display(byted,data):
     for  i in range(16):
@@ -43,6 +43,8 @@ def draw_byte_display(byted,data):
         else:
             byted.addch('.')
     byted.refresh(0,0,1,45,20,62)
+
+hex_edit('/home/fanis1996/Downloads/f1')
 
                      
     
