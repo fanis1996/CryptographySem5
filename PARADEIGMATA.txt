@@ -1,0 +1,53 @@
+Encrypt - Decrypt
+Το πρόγραμμα " ./crypto.py enc " κρυπτογραφεί το stdin με την βοήθεια του openssl.
+	echo "KEIMENO GIA KRYPTOGRAFISI!!!!!" | ./crypto.py enc -k PASSWORD
+
+- Με τις επιλογές -in filename ή -out filename μπορούμε να αλλάξουμε την είσοδο-έξοδο
+	./crypto.py enc -k PASSWORD -in /tmp/MYFILE -out /tmp/myfile.enc
+
+- Με το -d το πρόγραμμα κάνει decrypt το stdin (αντίστοιχα ισχύσουν και εδώ οι επιλογές -in -out)
+	./crypto.py enc -k PASSWORD -in /tmp/MYFILE | ./crypto end -k PASSWORD -d
+
+- Επιλογή -alg ρυθμίζει τον επιλεγμένο αλγόριθμο. Υπάρχουν 4εις επιλογές ανάμεσα σε aes-256-cbc,des-cbc,idea-cbc,bf-cbc με προεπιλεγμένο τον aes
+	./crypto.py enc -k PASSWORD -in /tmp/MYFILE -alg des-cbc
+
+Bit Flip
+Το πρόγραμμα " ./crypto.py bitf " επεξεργάζεται τα bits του stdin με βάση τις εντολές του χρήστη
+	./crypto.py bitf -B 0 0 1
+
+- Με τις επιλογές -B BytePos BitPos1 BitPos2... αλλάζουμε στο byte της θέσεις <BytePos> τα bit στις θέσεις BitPosN
+Πχ αν στην θέση 2 του αρχείου βρίσκετε το 0x73 (0b01110011) τότε η εντολή -B 2 0 2 3 5 θα το κάνει 0x5e (0b01011110), δλδ θα κάνει flip τα bit στις θέσεις 0 2 3 κ 5.
+
+	$ echo "test~" | xxd
+	00000000: 7465 7374 7e0a                           test~.
+	$ echo "test~" | ./crypto.py bitf -B 2 0 2 3 5| xxd
+	00000000: 7465 5e74 7e0a                           te^t~.
+
+- Με τις εντολές -x BYTE_POS XOR_EXP κάνουμε xor το byte στην θέση <bytepos> με το αποτέλεσμα της έκφρασης που έχουμε στο XOR_EXP. Η έκφραση μπορεί να είναι οτιδήποτε μαθηματικά σωστό που το αποτέλεσμα είναι 0<=χ<2**8.
+
+	$ echo "test~" | xxd
+	00000000: 7465 7374 7e0a                           test~.
+	$ echo "test~" | ./crypto.py bitf -x 3 "ord('t')^ord('A')" | xxd
+	00000000: 7465 7341 7e0a                           tesA~.
+
+Hex Editor
+Για άμεση επεξεργασία των δεδομένων ο χρήστης μπορεί να χρησιμοποιήσει το πρόγραμμα "./hex_edit.py <FILENAME>", οπού είναι ένας binary επεξεργαστής υλοποιημένος σε ncurses.
+Τα κουμπιά είναι τα παρακάτω
+Normal Mode        (Επιλέγει το byte για επεξεργασία)
+    Move cursor : up/down/left/right (or h/j/k/l)
+    Edit Byte(bits): Enter (or i)
+    Save and exit: q
+Byte Edit Mode     (Επεξεργασία του επιλεγμένου byte)
+    Move cursor: left/right (or h/l)
+    Flip bit: Space (or c or ~)
+    Store Byte: Enter (or q, i)
+
+***Δεν μπορεί να επεξεργαστεί πολύ μεγάλα αρχεία***
+
+====Ολοκληρωμένο παράδειγμα====
+
+$ echo "input text, CRYPTO SEM 5, PYTHON, test test test AAAAAAAAAA BBBBBBBB" | ./crypto.py enc -k PASSWORD_EDW | ./crypto.py bitf -x 5 "ord('M') ^ ord('T')" -x 7 "ord('5') ^ ord('N')" -x 8 "ord(',') ^ ord('E')" -x 9 "ord(' ') ^ ord('w')"| ./crypto.py enc -k PASSWORD_EDW -d
+
+Ð˘) -jPÒDöoTO SET NEwPYTHON, test test test AAAAAAAAAA BBBBBBBB
+
+Βλέπουμε ότι ο επιτιθέμενος κατάφερε να αλλάξει το κείμενο "SEM 5, PYTHON" σε "SET NEwPYTHON" χωρίς να γνωρίζει το password.
