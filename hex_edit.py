@@ -1,3 +1,4 @@
+#!/bin/python
 import curses
 import binascii
 import os
@@ -116,4 +117,5 @@ def draw_byte_display(asciidisplay,data):
     asciidisplay.move(1,0)
     asciidisplay.noutrefresh(0,0,1,__OFFSET_PAD_W + 2 + __HEX_PAD_W + 2, 30, __OFFSET_PAD_W +2 + __HEX_PAD_W + 2 + __BYTE_PAD_W)
 
-hex_edit(sys.argv[1])
+if __name__ == "__main__":
+    hex_edit(sys.argv[1])
