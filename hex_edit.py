@@ -55,19 +55,17 @@ def hex_edit(filepath):
             bitsdisplay.addstr('{0:08b}'.format(data[x+(y-1)*__BLOCK_S]))
             bitsdisplay.move(0,0)
             bitsdisplay.refresh()
+            b = bytearray(data)
             xb = 0
             while 1:
                 c = bitsdisplay.getch()
                 if c == ord('e'):
                     break
-                elif c == 'a':
+                elif c == ord('f'):
                     #flip bit
                     bitsdisplay.erase()
-                    
-                    data[x+(y-1)*__BLOCK_S] ^=1<<(7-xb)
-                    scr.addstr(0,40,data[x+(y-1)*__BLOCK_S])
-                    scr.refresh()
-                    bitsdisplay.addstr('{0:08b}'.format(data[x+(y-1)*__BLOCK_S]))
+                    b[x+(y-1)*__BLOCK_S] ^=1<<(7-xb)
+                    bitsdisplay.addstr('{0:08b}'.format(b[x+(y-1)*__BLOCK_S]))
                     bitsdisplay.refresh()
                 elif c == curses.KEY_LEFT and xb>0:
                     #move left
@@ -79,6 +77,10 @@ def hex_edit(filepath):
                 bitsdisplay.refresh()
             bitsdisplay.erase()
             bitsdisplay.refresh()
+            data = bytes(b)
+            draw_hex_display(hexdisplay,data)
+            draw_byte_display(asciidisplay,data)
+            
                     
 
             
@@ -98,6 +100,7 @@ def draw_offs_display(offsd,rows):
     offsd.noutrefresh(0,0,1,0,30, __OFFSET_PAD_W)
 
 def draw_hex_display(hexd,data):
+    hexd.move(0,0)
     for i in range( __BLOCK_S):
         hexd.addstr("{0:2X} ".format(i))
         #https://stackoverflow.com/questions/19210414/byte-array-to-hex-string
@@ -106,6 +109,7 @@ def draw_hex_display(hexd,data):
     hexd.noutrefresh(0,0,1, __OFFSET_PAD_W + 2,30, __OFFSET_PAD_W + 2 + __HEX_PAD_W)
 
 def draw_byte_display(asciidisplay,data):
+    asciidisplay.move(0,0)
     for  i in range(__BLOCK_S):
         asciidisplay.addstr("{0:X}".format(i))
     for i in range(len(data)):
