@@ -48,7 +48,7 @@ def hex_edit(filepath):
         elif c == curses.KEY_DOWN and y<Trows-1:
             hexdisplay.chgat(y,3*x,2,)
             y+=1
-        elif c == ord('e'):
+        elif c == 10:
             #edit
             bitsdisplay = curses.newwin(1,9,0,16)
             bitsdisplay.keypad(True)
@@ -59,9 +59,9 @@ def hex_edit(filepath):
             xb = 0
             while 1:
                 c = bitsdisplay.getch()
-                if c == ord('e'):
+                if c == 10:
                     break
-                elif c == ord('f'):
+                elif c == ord(' '):
                     #flip bit
                     bitsdisplay.erase()
                     b[x+(y-1)*__BLOCK_S] ^=1<<(7-xb)
