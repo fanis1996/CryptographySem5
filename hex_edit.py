@@ -36,19 +36,19 @@ def hex_edit(filepath):
             with open(filepath,'wb') as f:
                 f.write(data)
             break
-        elif c == curses.KEY_RIGHT and x<__BYTE_PAD_W-1:
+        elif c in [curses.KEY_RIGHT, ord('l')] and x<__BYTE_PAD_W-1:
             hexdisplay.chgat(y,3*x,2,)
             x+=1
-        elif c == curses.KEY_LEFT and x>0:
+        elif c in [curses.KEY_LEFT, ord('h')] and x>0:
             hexdisplay.chgat(y,3*x,2,)
             x-=1
-        elif c == curses.KEY_UP and y>1:
+        elif c in [curses.KEY_UP, ord('k')] and y>1:
             hexdisplay.chgat(y,3*x,2,)
             y-=1
-        elif c == curses.KEY_DOWN and y<Trows-1:
+        elif c in [curses.KEY_DOWN, ord('j')] and y<Trows-1:
             hexdisplay.chgat(y,3*x,2,)
             y+=1
-        elif c == 10:
+        elif c in [10, ord('i')]:
             #edit
             bitsdisplay = curses.newwin(1,9,0,16)
             bitsdisplay.keypad(True)
@@ -59,18 +59,18 @@ def hex_edit(filepath):
             xb = 0
             while 1:
                 c = bitsdisplay.getch()
-                if c == 10:
+                if c in [10, 27, ord('i'), ord('q')]:
                     break
-                elif c == ord(' '):
+                elif c in [ord(' '), ord('c'), ord('~')]:
                     #flip bit
                     bitsdisplay.erase()
                     b[x+(y-1)*__BLOCK_S] ^=1<<(7-xb)
                     bitsdisplay.addstr('{0:08b}'.format(b[x+(y-1)*__BLOCK_S]))
                     bitsdisplay.refresh()
-                elif c == curses.KEY_LEFT and xb>0:
+                elif c in [curses.KEY_LEFT, ord('h')] and xb>0:
                     #move left
                     xb-=1
-                elif c == curses.KEY_RIGHT and xb<8:
+                elif c in [curses.KEY_RIGHT, ord('l')] and xb<7:
                     #move right
                     xb+=1
                 bitsdisplay.move(0,xb)
@@ -80,17 +80,13 @@ def hex_edit(filepath):
             data = bytes(b)
             draw_hex_display(hexdisplay,data)
             draw_byte_display(asciidisplay,data)
-            
-                    
 
-            
         hexdisplay.chgat(y,3*x,2,curses.A_STANDOUT)
         hexdisplay.noutrefresh(0,0,1, __OFFSET_PAD_W + 2,30, __OFFSET_PAD_W + 2 + __HEX_PAD_W)
         asciidisplay.move(y,x)
         asciidisplay.noutrefresh(0,0,1,__OFFSET_PAD_W + 2 + __HEX_PAD_W + 2, 30, __OFFSET_PAD_W +2 + __HEX_PAD_W + 2 + __BYTE_PAD_W)
         curses.doupdate()
-        
-        
+
     curses.endwin()
 
 def draw_offs_display(offsd,rows):
