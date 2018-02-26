@@ -113,7 +113,7 @@ def draw_byte_display(asciidisplay,data):
             asciidisplay.addch(data[i])
         else:
             asciidisplay.addch('.')
-    asciidisplay.move(0,0)
+    asciidisplay.move(1,0)
     asciidisplay.noutrefresh(0,0,1,__OFFSET_PAD_W + 2 + __HEX_PAD_W + 2, 30, __OFFSET_PAD_W +2 + __HEX_PAD_W + 2 + __BYTE_PAD_W)
 
 hex_edit(sys.argv[1])
