@@ -52,6 +52,7 @@ def parse_arguments(args):
     parser_bf.add_argument('--in-file', nargs='?', type=argparse.FileType('r+b'), default=sys.stdin.buffer)
     parser_bf.add_argument('--out-file', nargs='?', type=argparse.FileType('w+b'), default=sys.stdout.buffer)
     parser_bf.add_argument('-B', '--flip-bits', action=BitFlipAction, help="Flip bits of byte at BYTE_POS", metavar=('BYTE_POS', '\bBitPos1 [BitPos2'))
+    parser_bf.add_argument('-x', '--xor-byte', action=XorAction, help="xor byte at BYTE_POS with value of XOR_EXP expression", metavar=('BYTE_POS', 'XOR_EXP'), dest='flip_bits')
 
     return parser.parse_args(args), parser.print_help
 
@@ -59,6 +60,25 @@ def _ensure_value(namespace, name, value):
     if getattr(namespace, name, None) is None:
         setattr(namespace, name, value)
     return getattr(namespace, name)
+
+class XorAction(argparse.Action):
+    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+        super(XorAction, self).__init__(option_strings, dest, nargs=nargs, **kwargs)
+    def __call__(self, parser, namespace, values, option_string=None):
+        try:
+            byte_pos = int(values[0], 0)
+            xorval = int(eval(values[1]))
+            if not 0<=xorval<2**8:
+                msg='argument "{f}": value "{n}" in "{v}" must be between 0 and 2**8-1'.format(f=self.dest, n=xorval, v=option_string + ' '+ str(' '.join(values)))
+                raise argparse.ArgumentTypeError(msg)
+                V.append(int(v, 0))
+        except (TypeError, ValueError):
+            msg='argument "{f}": option "{n}" or "{n2}" in "{v}" is not a number'.format(f=self.dest, n=values[0], n2=values[1], v=option_string + ' '+ str(' '.join(values)))
+            raise argparse.ArgumentTypeError(msg)
+        items = _copy.copy(_ensure_value(namespace, self.dest, []))
+        items.append({'byte_pos':byte_pos, 'x': xorval})
+        setattr(namespace, self.dest, items)
+
 
 class BitFlipAction(argparse.Action):
     def __init__(self, option_strings, dest, nargs='+', **kwargs):
